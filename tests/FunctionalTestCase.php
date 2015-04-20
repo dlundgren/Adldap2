@@ -1,19 +1,45 @@
 <?php
 
-namespace adLDAP\Tests;
+namespace Adldap\Tests;
 
 use Mockery;
 
 abstract class FunctionalTestCase extends \PHPUnit_Framework_TestCase
 {
+    public $configStub = array(
+        'account_suffix' => 'Account Suffix',
+        'base_dn' => 'Base DN',
+        'domain_controllers' => array('dc1', 'dc2'),
+        'admin_username' => 'Admin Username',
+        'admin_password' => 'Admin Password',
+        'real_primarygroup' => 'Primary Group',
+        'use_ssl' => true,
+        'use_tls' => true,
+        'sso' => true,
+        'recursive_groups' => true,
+        'follow_referrals' => true,
+        'ad_port' => 500,
+    );
+
+    /**
+     * Returns a mocked version of the specified class
+     *
+     * @param $class
+     * @return Mockery\MockInterface
+     */
     protected function mock($class)
     {
         return Mockery::mock($class);
     }
 
+    /**
+     * Returns a mocked connection
+     *
+     * @return Mockery\MockInterface
+     */
     protected function newConnectionMock()
     {
-        return $this->mock('adLDAP\Connections\Ldap');
+        return $this->mock('Adldap\Interfaces\ConnectionInterface');
     }
 
     public function setUp()
@@ -28,5 +54,10 @@ abstract class FunctionalTestCase extends \PHPUnit_Framework_TestCase
         if( ! array_key_exists('KRB5CCNAME', $_SERVER)) $_SERVER['KRB5CCNAME'] = 'true';
 
         parent::setUp();
+    }
+
+    public function tearDown()
+    {
+        Mockery::close();
     }
 }

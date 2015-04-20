@@ -1,27 +1,11 @@
 <?php
 
-namespace adLDAP\Tests;
+namespace Adldap\Tests;
 
-use adLDAP\adLDAP;
+use Adldap\Adldap;
 
 class AdldapConstructTest extends FunctionalTestCase
 {
-    /**
-     * This tests that the connection function isSupported
-     * returns false, and an exception is thrown when it
-     * has been called.
-     */
-    public function testAdldapConstructLdapNotSupportedFailure()
-    {
-        $this->setExpectedException('adLDAP\adLDAPException');
-
-        $connection = $this->newConnectionMock();
-
-        $connection->shouldReceive('isSupported')->andReturn(false);
-
-        new adLDAP(array(), $connection);
-    }
-
     /**
      * This tests that the first configuration parameter
      * must be an array, and will fail constructing with
@@ -31,7 +15,7 @@ class AdldapConstructTest extends FunctionalTestCase
     {
         try
         {
-            new adLDAP('test');
+            new Adldap('test');
 
             $passes = false;
         } catch(\Exception $e)
@@ -45,7 +29,7 @@ class AdldapConstructTest extends FunctionalTestCase
     /**
      * This tests that a recoverable exception was thrown
      * when an invalid type hinted connection is passed into
-     * the connection parameter in the adLDAP constructor.
+     * the connection parameter in the Adldap constructor.
      */
     public function testAdlapConstructInvalidConnectionTypeHint()
     {
@@ -53,7 +37,7 @@ class AdldapConstructTest extends FunctionalTestCase
 
         try
         {
-            new adLDAP(array(), $connection);
+            new Adldap(array(), $connection);
 
             $passes = false;
         } catch(\Exception $e)
@@ -71,13 +55,59 @@ class AdldapConstructTest extends FunctionalTestCase
      */
     public function testAdldapConstructDomainControllerFailure()
     {
-        $this->setExpectedException('adLDAP\adLDAPException');
-
         $config = array(
             'domain_controllers' => 'test'
         );
 
-        new adLDAP($config);
+        try
+        {
+            new Adldap($config);
+
+            $passes = false;
+        } catch (\Exception $e)
+        {
+            $passes = true;
+        }
+
+        $this->assertTrue($passes);
+    }
+
+    /**
+     * This test demonstrates that all attributes are set
+     * properly on construct.
+     */
+    public function testAdldapConstructConfig()
+    {
+        $connection = $this->newConnectionMock();
+
+        $connection
+            ->shouldReceive('isSupported')->andReturn(true)
+            ->shouldReceive('isSaslSupported')->andReturn(true)
+            ->shouldReceive('useSSO')->andReturn(true)
+            ->shouldReceive('useSSL')->andReturn(true)
+            ->shouldReceive('useTLS')->andReturn(true)
+            ->shouldReceive('startTLS')->andReturn(true)
+            ->shouldReceive('isUsingSSL')->andReturn(true)
+            ->shouldReceive('isUsingTLS')->andReturn(true)
+            ->shouldReceive('isUsingSSO')->andReturn(true)
+            ->shouldReceive('connect')->andReturn(true)
+            ->shouldReceive('setOption')->twice()
+            ->shouldReceive('bind')->andReturn('resource')
+            ->shouldReceive('close')->andReturn(true);
+
+        $ad = new Adldap($this->configStub, $connection);
+
+        $this->assertInstanceOf('Adldap\Interfaces\ConnectionInterface', $ad->getLdapConnection());
+
+        $this->assertEquals(500, $ad->getPort());
+        $this->assertEquals(array('dc1', 'dc2'), $ad->getDomainControllers());
+        $this->assertEquals('Base DN', $ad->getBaseDn());
+        $this->assertEquals('Account Suffix', $ad->getAccountSuffix());
+
+        $this->assertTrue($ad->getRecursiveGroups());
+        $this->assertTrue($ad->getUseSSL());
+        $this->assertTrue($ad->getUseTLS());
+        $this->assertTrue($ad->getUseSSO());
     }
 
     /**
@@ -90,6 +120,8 @@ class AdldapConstructTest extends FunctionalTestCase
 
         $config = array(
             'sso' => true,
+            'domain_controllers' => array('domain'),
+            'ad_port' => '100'
         );
 
         /*
@@ -108,8 +140,26 @@ class AdldapConstructTest extends FunctionalTestCase
             ->shouldReceive('bind')->andReturn('resource')
             ->shouldReceive('close')->andReturn(true);
 
-        $ad = new adLDAP($config, $connection);
+        $ad = new Adldap($config, $connection);
 
         $this->assertTrue($ad->getUseSSO());
+    }
+
+    /**
+     * This tests that when auto-connect is false,
+     * the connect method is not called on the current
+     * connection until manually called.
+     */
+    public function testAdldapConstructNoAutoConnect()
+    {
+        $connection = $this->newConnectionMock();
+
+        $differentConnection = $this->newConnectionMock();
+
+        $ad = new Adldap(array(), $connection, false);
+
+        $differentConnection->shouldReceive('close')->once()->andReturn(true);
+
+        $ad->setLdapConnection($differentConnection);
     }
 }

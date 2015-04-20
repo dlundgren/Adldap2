@@ -1,101 +1,74 @@
 ![AdLDAP 2 Banner]
 (https://github.com/adldap2/adldap2/blob/master/adldap2-banner.jpg)
 
-[![Build Status](https://travis-ci.org/adLDAP2/adLDAP2.svg)](https://travis-ci.org/adLDAP2/adLDAP2)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/adLDAP2/adLDAP2/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/adLDAP2/adLDAP2/?branch=master)
-[![Total Downloads](https://poser.pugx.org/adldap2/adldap2/downloads.svg)](https://packagist.org/packages/adldap2/adldap2)
-[![Latest Stable Version](https://poser.pugx.org/adldap2/adldap2/v/stable.svg)](https://packagist.org/packages/adldap2/adldap2)
-[![License](https://poser.pugx.org/adldap2/adldap2/license.svg)](https://packagist.org/packages/adldap2/adldap2)
+[![Build Status](https://img.shields.io/travis/Adldap2/Adldap2.svg?style=flat-square)](https://travis-ci.org/Adldap2/Adldap2)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/adLDAP2/adLDAP2/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/adLDAP2/adLDAP2/?branch=master)
+[![SensioLabsInsight](https://img.shields.io/sensiolabs/i/45a86fc2-b202-4f1b-9549-679900e5807c.svg?style=flat-square)](https://insight.sensiolabs.com/projects/45a86fc2-b202-4f1b-9549-679900e5807c)
+[![Total Downloads](https://img.shields.io/packagist/dt/adldap2/adldap2.svg?style=flat-square)](https://packagist.org/packages/adldap2/adldap2)
+[![Latest Stable Version](https://img.shields.io/packagist/v/adldap2/adldap2.svg?style=flat-square)](https://packagist.org/packages/adldap2/adldap2)
+[![License](https://img.shields.io/packagist/l/adldap2/adldap2.svg?style=flat-square)](https://packagist.org/packages/adldap2/adldap2)
 
-> **Note:** This is a fork of the main abandoned adLDAP repository. You can file issues and pull-requests here and I will address / merge them.
-> Looking for the original repository? [Click here](https://github.com/adLDAP/adLDAP).
-
-Originally written by Scott Barnett and Richard Hyland. Adopted by the community.
-
-## To Do
-
-- Completely refresh all classes and improve the terrible scrutinizer score
-- Unit / Functional Testing
-- Better, and easier to understand documentation
-- Create LDAP encapsulation class for easier testing and possible support for other connections
-
-#### Primary Goal
-
-- Keep existing API for easy upgrades for existing users
+> Originally written by Scott Barnett and Richard Hyland. Adopted by the community.
 
 ## Description
 
-adLDAP2 is a PHP class library that provides LDAP authentication and Active Directory management tools.
+Adldap2 is a tested PHP class library that provides LDAP authentication and Active Directory management tools.
+
+## Index
+
+> **Note:** Documentation is incomplete as Adldap is currently in the upgrade process to version `5.0.0`. They will be fully featured and complete in the coming weeks.
+
+- [Installation](#installation)
+- [Upgrading to v5 from v4](docs/UPGRADING.md)
+- [Getting Started](docs/GETTING-STARTED.md)
+- Usage 
+ - [Search Functions](docs/SEARCH-FUNCTIONS.md)
+ - [Computer Functions](docs/COMPUTER-FUNCTIONS.md)
+ - [Contact Functions](docs/CONTACT-FUNCTIONS.md)
+ - [Exchange Functions](docs/EXCHANGE-FUNCTIONS.md)
+ - [Folder Functions](docs/FOLDER-FUNCTIONS.md)
+ - [Group Functions](docs/GROUP-FUNCTIONS.md)
+ - [User Functions](docs/USER-FUNCTIONS.md)
 
 ## Requirements
 
-To use adLDAP2, your sever must support:
+To use Adldap2, your sever must support:
 
 - PHP 5.3 or greater
 - PHP SSL Libraries (http://php.net/openssl)
 
 ## Installation
 
-#### Via Composer
+Adldap2 has moved to a composer based installation. If you'd like to use Adldap without an auto-loader, you'll
+have to require the files inside the project `src/` directory yourself.
 
-Add adLDAP2 to your `composer.json` file:
+Insert Adldap into your `composer.json` file:
 
-    "adldap2/adldap2": "4.0.*"
+    "adldap2/adldap2": "5.0.*"
+   
+Run `composer update`
 
-Run `composer update` on your project source, and you're all set!
+You're good to go!
 
-#### Manual Installation
+## Need to test an LDAP connection?
 
-The core of adLDAP is contained in the 'src/adLDAP' directory.  Simply copy/rename this directory inside your own
-projects.
+If you need to test something with access to an LDAP server, the generous folks at [Georgia Tech](http://drupal.gatech.edu/handbook/public-ldap-server) have you covered.
 
-Edit the file ``src/adldap/adLDAP.php`` and change the configuration variables near the top, specifically
-those for domain controllers, base dn and account suffix, and if you want to perform anything more complex
-than use authentication you'll also need to set the admin username and password variables too.
+Use the following configuration:
 
-From within your code simply require the adLDAP.php file and call it like so
-
-    use adLDAP\adLDAP;
+    $config = array(
+        'account_suffix' => "@gatech.edu",
     
-    require_once(dirname(__FILE__) . '/adLDAP.php');
+        'domain_controllers' => array("whitepages.gatech.edu"),
     
-    $adldap = new adLDAP();
-
-It would be better to wrap it in a try/catch though
-
-    use adLDAP\adLDAP;
+        'base_dn' => 'dc=whitepages,dc=gatech,dc=edu',
     
-    try
-    {
-        $adldap = new adLDAP();
-    }
-    catch (adLDAPException $e)
-    {
-        echo $e;
-        exit();   
-    }
-
-Then simply call commands against it e.g.
-
-``$adldap->authenticate($username, $password);``
-
-or 
-
-``$adldap->group()->members($groupName);``
-
-## Documentation
-
-You can find our website at https://github.com/adldap/adLDAP/ or the class documentation at
-
-https://github.com/adldap/adLDAP/wiki/adLDAP-Developer-API-Reference
-
-## License
-
-This library is free software; you can redistribute it and/or modify it under the terms of the 
-GNU Lesser General Public License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-See the GNU Lesser General Public License for more details or LICENSE.txt distributed with
-this class.
+        'admin_username' => '',
+    
+        'admin_password' => '',
+    );
+    
+    $ad = new Adldap($config);
+    
+However while useful for basic testing, the queryable data only includes user data, so if you're looking for testing with any other information
+or functionality such as modification, you'll have to use you're own server.
