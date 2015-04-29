@@ -7,7 +7,7 @@ To open a new search query, call the `search()` function on your AD object like 
     $ad = new Adldap($configuration);
     
     $ad->search();
-    
+
 #### All
 
 To retrieve all entries in your AD, use the all function:
@@ -42,7 +42,10 @@ We could also perform a search for all objects beginning with the common name of
 Or we can retrieve all objects that contain a common name attribute using the wildcard operator (`*`):
 
     $results = $ad->search()->where('cn', '*')->get();
-    
+
+Remember, fields are case insensitive, so it doesn't matter if you use `->where('CN', '*')` or `->where('cn', '*')`,
+they would return the same result.
+   
 It's also good to know that all values (except an asterisk `*`) inserted into a where, or an orWhere method,
 <b>are escaped</b> by default into a hex string, so you don't need to worry about escaping them. For example:
 
@@ -86,6 +89,9 @@ like so:
     // Selecting multiple fields
     $results = $ad->search()->select(array('cn', 'displayname'))->all();
 
+All searches will return *all* information for each entry. Be sure to use `select($fields = array())` when you only
+need a small amount of information.
+
 #### Sort By
 
 If you'd like to sort your returned results, call the `sortBy()` method like so:
@@ -109,6 +115,55 @@ to do so using:
 Then you can perform the above query like so:
 
     $results = $ad->search()->query("(cn=$escapedValue)");
+
+#### Paginate
+
+Pagination is useful when you have a limit on the returned results from LDAP. Using pagination, you will successfully be able
+to view all LDAP results. To paginate your results, call the `paginate()` method:
+
+    $perPage = 25;
+    
+    $currentPage = $_GET['page'];
+    
+    $results = $ad->search()->where('objectClass', '=', 'person')->paginate($perPage, $currentPage);
+    
+<b>It's also good to know, that the current page starts at zero (zero being the first page).</b> If you'd like to present pages
+differently, feel free to do so.
+
+Paginating a search result will return a `Adldap\Objects\Paginator` instance. This object provides some handy functions:
+
+    $results = $ad->search()->where('objectClass', '=', 'person')->paginate($perPage, $currentPage);
+    
+    $results->getPages(); // Returns total number of pages, int
+    
+    $results->getCurrentPage(); // Returns current page number, int
+    
+    $results->getPerPage(); // Returns the amount of entries allowed per page, int
+    
+    $results->count(); // Returns the total amount of retrieved entries, int
+    
+    // Iterate over the results like normal
+    
+    foreach($results as $result)
+    {
+        echo $result['cn'];
+    }
+
+#### Recursive
+
+By default, all searches performed are recursive. If you'd like to disable recursive search, use the `recursive()` method:
+
+    $result = $ad->search()->recursive(false)->all();
+    
+This would perform an `ldap_listing()` instead of an `ldap_search()`.
+
+#### Read
+
+If you'd like to perform a read instead of a listing or a recursive search, use the `read()` method:
+
+    $result = $ad->search()->read(true)->where('objectClass', '*')->get();
+    
+This would perform an `ldap_read()` instead of an `ldap_listing()` or an `ldap_search()`.
 
 #### Get Query
 
@@ -139,3 +194,62 @@ If you'd like to retrieve the current or wheres on the search object, call the `
 To retrieve the current selected fields in on the search object, use the `getSelects()` method:
 
     $selects = $ad->search()->select(array('cn', 'dn'))->getSelects();
+    
+    var_dump($selects);
+    
+#### Has Selects
+
+If you need to know if the search object currently contains selected fields, use the `hasSelects()` function:
+
+    echo $ad->search()->select('cn')->hasSelects(); // Returns true
+    
+### Examples
+
+#### User Examples
+
+Retrieving all users who <b>do not</b> have the common name of 'John':
+
+    $results = $ad->search()
+            ->where('objectClass', '=', $ad->getUserIdKey())
+            ->where('cn', '!', 'John')
+            ->get();
+    
+Retrieving all users who do not have the common name of 'John' or 'Suzy':
+
+    $results = $ad->search()
+                ->where('objectClass', '=', $ad->getUserIdKey())
+                ->orWhere('cn', '!', 'John')
+                ->orWhere('cn', '!', 'Suzy')
+                ->get();
+           
+Retrieving all users who have a mail account:
+
+    $results = $ad->search()
+                    ->where('objectClass', '=', $ad->getUserIdKey())
+                    ->where('mail', '*')
+                    ->get();
+                    
+#### Computer Examples
+
+Retrieving a all computers:
+
+    $results = $ad->search()
+            ->where('objectClass', '=', 'computer')
+            ->get();
+            
+Retrieving all computers that run Windows 7:
+
+    $results = $ad->search()
+            ->where('objectClass', '=', 'computer')
+            ->where('operatingSystem', '=', 'Windows 7*')
+            ->get();
+
+#### Folder (OU) examples
+
+Retrieving a folder:
+
+    $folderName = 'Accounting';
+    
+    $results = $this->adldap->search()
+                ->where('OU', '=', $folderName)
+                ->first();

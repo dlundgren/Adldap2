@@ -31,7 +31,7 @@ class AdldapMethodTest extends FunctionalTestCase
     {
         $ad = $this->newAdldapMock()->makePartial();
 
-        $controllers = array('dc1', 'dc2');
+        $controllers = ['dc1', 'dc2'];
 
         $ad->setDomainControllers($controllers);
 
@@ -151,7 +151,7 @@ class AdldapMethodTest extends FunctionalTestCase
     {
         $ad = $this->newAdldapMock()->makePartial();
 
-        $schemaAttributes = array(
+        $schemaAttributes = [
             'address_city' => 'Address City',
             'address_code' => 'Address Code',
             'address_country' => 'Address Country',
@@ -200,178 +200,60 @@ class AdldapMethodTest extends FunctionalTestCase
             'exchange_deliverandredirect' => 'Exchange Deliver And Redirect',
             'exchange_hidefromlists' => true,
             'contact_email' => 'Contact Email',
-        );
+        ];
 
         $ldapSchema = $ad->ldapSchema($schemaAttributes);
 
-        $expectedSchema = array(
-            'l' => array('Address City'),
-            'postalCode' => array('Address Code'),
-            'c' => array('Address Country'),
-            'postOfficeBox' => array('Address PBOX'),
-            'st' => array('Address State'),
-            'streetAddress' => array('Address Street'),
-            'company' => array('Company'),
-            'pwdLastSet' => array(0),
-            'department' => array('Department'),
-            'description' => array('Description'),
-            'displayName' => array('Display Name'),
-            'mail' => array('Email'),
-            'employeeId' => array('Employee ID'),
-            'accountExpires' => array('Expires'),
-            'givenName' => array('First Name'),
-            'homeDirectory' => array('Home Directory'),
-            'homeDrive' => array('Home Drive'),
-            'initials' => array('Initials'),
-            'userPrincipalName' => array('Logon Name'),
-            'manager' => array('Manager'),
-            'physicalDeliveryOfficeName' => array('Office'),
-            'unicodePwd' => array('Password'),
-            'profilepath' => array('Profile Path'),
-            'scriptPath' => array('Script Path'),
-            'sn' => array('Surname'),
-            'title' => array('Title'),
-            'telephoneNumber' => array('Telephone'),
-            'mobile' => array('Mobile'),
-            'pager' => array('Pager'),
-            'ipphone' => array('IP Phone'),
-            'wWWHomePage' => array('Web Page'),
-            'facsimileTelephoneNumber' => array('Fax'),
-            'userAccountControl' => array(true),
-            'homephone' => array('Home Phone'),
-            'dlMemSubmitPerms' => array('Group Send Permission'),
-            'dlMemRejectPerms' => array('Group Reject Permission'),
-            'homeMDB' => array('Exchange Home'),
-            'mailNickname' => array('Exchange Nickname'),
-            'proxyAddresses' => array('Exchange Proxy'),
-            'mDBUseDefaults' => array('Exchange Use Defaults'),
-            'msExchPoliciesExcluded' => array('Exchange Policy Exclude'),
-            'msExchPoliciesIncluded' => array('Exchange Policy Include'),
-            'showInAddressBook' => array('Exchange Address Book'),
-            'altRecipient' => array('Exchange Alt Recipient'),
-            'deliverAndRedirect' => array('Exchange Deliver And Redirect'),
-            'msExchHideFromAddressLists' => array(true),
-            'targetAddress' => array('Contact Email'),
-        );
+        $expectedSchema = [
+            'l' => ['Address City'],
+            'postalCode' => ['Address Code'],
+            'c' => ['Address Country'],
+            'postOfficeBox' => ['Address PBOX'],
+            'st' => ['Address State'],
+            'streetAddress' => ['Address Street'],
+            'company' => ['Company'],
+            'pwdLastSet' => [0],
+            'department' => ['Department'],
+            'description' => ['Description'],
+            'displayName' => ['Display Name'],
+            'mail' => ['Email'],
+            'employeeId' => ['Employee ID'],
+            'accountExpires' => ['Expires'],
+            'givenName' => ['First Name'],
+            'homeDirectory' => ['Home Directory'],
+            'homeDrive' => ['Home Drive'],
+            'initials' => ['Initials'],
+            'userPrincipalName' => ['Logon Name'],
+            'manager' => ['Manager'],
+            'physicalDeliveryOfficeName' => ['Office'],
+            'unicodePwd' => ['Password'],
+            'profilepath' => ['Profile Path'],
+            'scriptPath' => ['Script Path'],
+            'sn' => ['Surname'],
+            'title' => ['Title'],
+            'telephoneNumber' => ['Telephone'],
+            'mobile' => ['Mobile'],
+            'pager' => ['Pager'],
+            'ipphone' => ['IP Phone'],
+            'wWWHomePage' => ['Web Page'],
+            'facsimileTelephoneNumber' => ['Fax'],
+            'userAccountControl' => [true],
+            'homephone' => ['Home Phone'],
+            'dlMemSubmitPerms' => ['Group Send Permission'],
+            'dlMemRejectPerms' => ['Group Reject Permission'],
+            'homeMDB' => ['Exchange Home'],
+            'mailNickname' => ['Exchange Nickname'],
+            'proxyAddresses' => ['Exchange Proxy'],
+            'mDBUseDefaults' => ['Exchange Use Defaults'],
+            'msExchPoliciesExcluded' => ['Exchange Policy Exclude'],
+            'msExchPoliciesIncluded' => ['Exchange Policy Include'],
+            'showInAddressBook' => ['Exchange Address Book'],
+            'altRecipient' => ['Exchange Alt Recipient'],
+            'deliverAndRedirect' => ['Exchange Deliver And Redirect'],
+            'msExchHideFromAddressLists' => [true],
+            'targetAddress' => ['Contact Email'],
+        ];
 
         $this->assertEquals($expectedSchema, $ldapSchema);
-    }
-
-    /**
-     * This tests that the adldap global search
-     * method properly parses returned ldap results.
-     */
-    public function testAdldapSearch()
-    {
-        $ad = $this->newAdldapMock()->makePartial();
-
-        $connection = $this->newConnectionMock();
-
-        $ad->setLdapConnection($connection);
-
-        $returnedLdapEntries = array(
-            'count' => 3,
-            0 => array(
-                0 => 'distinguishedname',
-                'count' => 1,
-                'dn' => 'CN=Karen Berge,CN=admin,DC=corp,DC=Fabrikam,DC=COM',
-                'distinguishedname' => array(
-                    'count' => 1,
-                    'CN=Karen Berge,CN=admin,DC=corp,DC=Fabrikam,DC=COM',
-                ),
-            ),
-            1 => array(
-                0 => 'distinguishedname',
-                'count' => 1,
-                'dn' => 'CN=Doe\, John,CN=admin,DC=corp,DC=Fabrikam,DC=COM',
-                'distinguishedname' => array(
-                    'count' => 1,
-                    'CN=Doe\, John,CN=admin,DC=corp,DC=Fabrikam,DC=COM',
-                ),
-            ),
-            2 => array(
-                0 => 'cn',
-                'cn' => array(
-                    'count' => 1,
-                    0 => 'Test',
-                ),
-                'distinguishedname' => array(
-                    'count' => 1,
-                    0 => 'CN=Bauman\, Steve,OU=Users,OU=Developers,OU=User Accounts,OU=Canada,DC=corp,DC=Fabrikam,DC=COM',
-                ),
-                1 => 'distinguishedname',
-                'displayname' => array(
-                    'count' => 1,
-                    0 => 'Bauman, Steve'
-                ),
-                2 => 'displayname',
-                'samaccountname' => array(
-                    'count' => 1,
-                    0 => 'stevebauman',
-                ),
-                3 => 'samaccountname',
-                'count' => 4,
-                'dn' => 'CN=Bauman\, Steve,OU=Users,OU=Developers,OU=User Accounts,OU=Canada,DC=corp,DC=Fabrikam,DC=COM'
-            )
-        );
-
-        $explodedDnsToReturn = array(
-            ldap_explode_dn($returnedLdapEntries[0]['dn'], 1),
-            ldap_explode_dn($returnedLdapEntries[1]['dn'], 1),
-            ldap_explode_dn($returnedLdapEntries[2]['dn'], 1)
-        );
-
-        $connection
-            ->shouldReceive('escape')->once()->andReturn()
-            ->shouldReceive('search')->once()->andReturn('resource')
-            ->shouldReceive('getEntries')->once()->andReturn($returnedLdapEntries)
-            ->shouldReceive('explodeDn')->times(3)->andReturnValues($explodedDnsToReturn)
-            ->shouldReceive('close')->andReturn(true);
-
-        $expectedResults = array(
-            array(
-                'dn' => 'CN=Karen Berge,CN=admin,DC=corp,DC=Fabrikam,DC=COM',
-                'dn_array' => array(
-                    'count' => 5,
-                    0 => 'Karen Berge',
-                    1 => 'admin',
-                    2 => 'corp',
-                    3 => 'Fabrikam',
-                    4 => 'COM',
-                ),
-            ),
-            array(
-                'dn' => 'CN=Doe\, John,CN=admin,DC=corp,DC=Fabrikam,DC=COM',
-                'dn_array' => array(
-                    'count' => 5,
-                    0 => 'Doe\2C John',
-                    1 => 'admin',
-                    2 => 'corp',
-                    3 => 'Fabrikam',
-                    4 => 'COM',
-                ),
-            ),
-            array(
-                'cn' => 'Test',
-                'displayname' => 'Bauman, Steve',
-                'samaccountname' => 'stevebauman',
-                'dn' => 'CN=Bauman\, Steve,OU=Users,OU=Developers,OU=User Accounts,OU=Canada,DC=corp,DC=Fabrikam,DC=COM',
-                'dn_array' => array(
-                    'count' => 8,
-                    0 => 'Bauman\2C Steve',
-                    1 => 'Users',
-                    2 => 'Developers',
-                    3 => 'User Accounts',
-                    4 => 'Canada',
-                    5 => 'corp',
-                    6 => 'Fabrikam',
-                    7 => 'COM',
-                ),
-            ),
-        );
-
-        $actualResults = $ad->search()->all();
-
-        $this->assertEquals($expectedResults, $actualResults);
     }
 }
